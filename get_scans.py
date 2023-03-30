@@ -17,30 +17,17 @@ class Listener(Node):
         # self.current_scan = LaserScan()
         self.background_set = False
         self.background_scan = LaserScan()
-        self.last_five = []
+        self.all_scans = []
         self.get_scans = self.create_subscription(
             LaserScan,
             '/scan',
             self.listener_callback,
             10)
 
-        # self.send_data = self.create_publisher(LaserScan,'transfer_scans',10)
         self.send_bg = self.create_publisher(LaserScan,'bg_scan',10)
-        # self.ranges
     def listener_callback(self,data=LaserScan()): 
-        # self.get_logger().info(f"received LaserScan message: {self.laser_scan.ranges}")
-        # self.send_data.publish(data)
         if (not(self.background_set)):
             self.last_five.append(data)
-        # if(len(self.background_scan.ranges) == 0):
-        #     self.background_scan = data
-        # else:
-        #     for i in range(len(self.background_scan.ranges)):
-        #         if (data.ranges[i] == float('inf')):
-        #             if (background_scan.ranges[i] == float('inf')):
-        #                 continue;
-        #             elif (abs(background_scan.ranges[i] - data.range_max) ):
-        print(self.background_set)
         if (len(self.last_five) == 5 and not(self.background_set)) :
             self.is_background()
             self.last_five.pop(0)
@@ -61,7 +48,7 @@ class Listener(Node):
                     elif (abs(average - self.last_five[j].ranges[i]) > 0.1):
                         return
             self.background_scan = self.last_five[2]
-            self.get_logger().info(f"received LaserScan message: {self.background_scan.ranges}")
+            # self.get_logger().info(f"received LaserScan message: {self.background_scan.ranges}")
             self.send_bg.publish(self.last_five[2])
             self.background_set = True
 
