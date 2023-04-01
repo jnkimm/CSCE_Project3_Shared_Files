@@ -14,6 +14,7 @@ def generate_launch_description():
     count_people_node = Node(package = "project3", executable = "count_people")
 
     rviz = ExecuteProcess(cmd = ['rviz'])
+
     ld.add_action(rviz)
 
     # starting nodes
