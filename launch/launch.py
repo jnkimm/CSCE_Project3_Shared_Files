@@ -7,15 +7,15 @@ from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
     arg = DeclareLaunchArgument('bag_in')
+    arg = DeclareLaunchArgument('bag_out')
 
     ld = LaunchDescription([arg])
 
-    get_scans_node = Node(package = "project3", executable = "get_scans")
-    count_people_node = Node(package = "project3", executable = "count_people")
+    get_scans_node = Node(package = "project_3", executable = "get_scans")
+    count_people_node = Node(package = "project_3", executable = "count_people")
 
-    rviz = ExecuteProcess(cmd = ['rviz'])
-
-    ld.add_action(rviz)
+    # rviz = ExecuteProcess(cmd = ['rviz2'])
+    # ld.add_action(rviz)
 
     # starting nodes
     ld.add_action(get_scans_node)
@@ -26,8 +26,12 @@ def generate_launch_description():
     ep = ExecuteProcess(cmd = ['ros2', 'bag', 'play', bag])
     ld.add_action(ep)
 
+    bag_o = LaunchConfiguration('bag_out')
+    bag_exec = ExecuteProcess(cmd = ['ros2', 'bag', 'record', '/person_locations', '/people_count_current', 'people_count_total', '/test', bag_o])
+    ld.add_action(bag_exec)
+
     # exiting process
-    event_handler = OnProcessExit(target_action = ep, on_exit = [EmitEvent(event = Shutdown())])
+    event_handler = OnProcessExit(target_action = bag_exec, on_exit = [EmitEvent(event = Shutdown())])
     terminate_at_end = RegisterEventHandler(event_handler)
 
     ld.add_action(terminate_at_end)
